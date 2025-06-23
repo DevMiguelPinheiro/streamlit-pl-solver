@@ -321,27 +321,31 @@ with st.sidebar:
     c2 = st.number_input("Coeficiente de x₂:", value=2.0, step=0.1)
     
     # Número de restrições
-    num_constraints = st.slider("Número de Restrições:", 1, 6, 3)
+    num_constraints = st.slider("Número de Restrições:", 1, 6, 4)
     
     # Coeficientes das restrições
     st.subheader("Restrições")
     A = []
     b = []
     sense = []
-    
+    restricoes_padrao = [
+        {'a1': 1.0, 'a2': 2.0, 'sense': '<=', 'rhs': 6.0},
+        {'a1': 2.0, 'a2': 1.0, 'sense': '<=', 'rhs': 8.0},
+        {'a1': -1.0, 'a2': 1.0, 'sense': '<=', 'rhs': 1.0},
+        {'a1': 0.0, 'a2': 1.0, 'sense': '<=', 'rhs': 2.0},
+    ]
     for i in range(num_constraints):
         st.markdown(f"**Restrição {i+1}:**")
         col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
-        
+        padrao = restricoes_padrao[i] if i < len(restricoes_padrao) else {'a1': 1.0, 'a2': 1.0, 'sense': '<=', 'rhs': 1.0}
         with col1:
-            a1 = st.number_input(f"x₁", value=1.0, key=f"a1_{i}")
+            a1 = st.number_input(f"x₁", value=padrao['a1'], key=f"a1_{i}")
         with col2:
-            a2 = st.number_input(f"x₂", value=1.0, key=f"a2_{i}")
+            a2 = st.number_input(f"x₂", value=padrao['a2'], key=f"a2_{i}")
         with col3:
-            sense_type = st.selectbox("Tipo", ["<=", ">=", "="], key=f"sense_{i}")
+            sense_type = st.selectbox("Tipo", ["<=", ">=", "="], index=["<=", ">=", "="].index(padrao['sense']), key=f"sense_{i}")
         with col4:
-            rhs = st.number_input("RHS", value=10.0, key=f"rhs_{i}")
-        
+            rhs = st.number_input("RHS", value=padrao['rhs'], key=f"rhs_{i}")
         A.append([a1, a2])
         b.append(rhs)
         sense.append(sense_type)
@@ -468,18 +472,19 @@ if solve_button:
 else:
     st.info("👈 Use a barra lateral para definir o problema de programação linear e clique em 'Resolver Problema'")
     
-    # Exemplo do problema 3.1.1 do Lachtermacher
-    st.header("📚 Exemplo: Problema 3.1.1 do Lachtermacher")
+    # Exemplo do problema do Excel Solver
+    st.header("📚 Exemplo: Problema de Programação Linear (igual ao Excel Solver)")
     st.markdown("""
     **Problema:** Maximizar Z = 3x₁ + 2x₂
     
     **Sujeito a:**
-    - x₁ + x₂ ≤ 10
-    - 2x₁ + x₂ ≤ 15
-    - x₁ ≤ 8
+    - x₁ + 2x₂ ≤ 6
+    - 2x₁ + x₂ ≤ 8
+    - -x₁ + x₂ ≤ 1
+    - x₂ ≤ 2
     - x₁, x₂ ≥ 0
     
-    **Solução:** x₁ = 5, x₂ = 5, Z = 25
+    **Solução:** x₁ = 3,333..., x₂ = 1,333..., Z = 12,666...
     """)
     
     # Instruções de uso
